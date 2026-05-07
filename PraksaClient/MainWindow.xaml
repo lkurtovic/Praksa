@@ -15,6 +15,9 @@
             <TabItem Header="Boxes">
                 <views:BoxSortView/>
             </TabItem>
+            <TabItem Header="Calculator">
+                <views:CalculatorView/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

@@ -1,6 +1,7 @@
 ﻿using PraksaClient.Helpers;
 using PraksaClient.Models;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -28,8 +30,7 @@ namespace PraksaClient.ViewModels
         public ObservableCollection<Box> TallestBoxes { get; }
         public ObservableCollection<Box> TallestBoxesTracker { get; }
 
-        public ObservableCollection<Box> MinHeap { get; }
-
+        public ObservableCollection<ObservableCollection<Box>> MinHeap { get; }
 
         #endregion
 
@@ -52,9 +53,11 @@ namespace PraksaClient.ViewModels
             TallestBoxes = new ObservableCollection<Box>();
             TallestBoxesTracker = new ObservableCollection<Box>();
 
+            MinHeap = new ObservableCollection<ObservableCollection<Box>>();
+
             GenerateBoxesCommand = new GenericCommand(GenerateBoxes, CanGenerateBoxes);
             SortBoxesCommand = new GenericCommand(SortBoxes, CanSortBoxes);
-            TallestBoxesCommand = new GenericCommand(FindTallestBoxes2, CanMakeTallestBoxes);
+            TallestBoxesCommand = new GenericCommand(minHeap, CanMakeTallestBoxes);
         }
 
         #endregion
@@ -96,7 +99,34 @@ namespace PraksaClient.ViewModels
                 }
             }
         }
-
+        
+        private void minHeap()
+        {
+            MinHeap.Clear();
+            ObservableCollection<Box> new_list = new ObservableCollection<Box>();
+            new_list.Add(SortedBoxes[0]);
+            MinHeap.Add(new_list);
+            for (int i=1; i < SortedBoxes.Count; i++)
+            {
+                bool placed = false;
+                for (int j = 0; j < MinHeap.Count; j++)
+                    {
+                        if (SortedBoxes[i].Width <= MinHeap[j][MinHeap[j].Count-1].Width && SortedBoxes[i].Length <= MinHeap[j][MinHeap[j].Count-1].Length)
+                        {
+                            MinHeap[j].Add(SortedBoxes[i]);
+                            placed = true;
+                            break;
+                        }
+                    }              
+                if(placed == false)
+                {
+                    ObservableCollection<Box> new_list1 = new ObservableCollection<Box>();
+                    new_list1.Add(SortedBoxes[i]);
+                    MinHeap.Add(new_list1);
+                }
+            }
+        }
+       
 
         private void FindTallestBoxes() {
             TallestBoxes.Clear();
